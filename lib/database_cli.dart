@@ -16,7 +16,7 @@ const helpMessage = '''\t
 
 // ignore: prefer_function_declarations_over_variables
 void Function(Object) print = (object) {};
-
+bool textAlignLeft = true;
 late final DatabaseReference dbRef;
 late final FirebaseApp app;
 Map<dynamic, dynamic> dbNotes = {}, dbAverages = {};
@@ -33,8 +33,6 @@ Future<void> finish() async {
 }
 
 /// Sets up the required settings and connections for Firebase.
-///
-/// [district] can be `'district-four'` or `'dcmp'`.
 Future<void> setupFirebase() async {
   WidgetsFlutterBinding.ensureInitialized();
   print('Setting up Firebase... (Wait for the > arrow)');
@@ -62,7 +60,13 @@ Future<void> setupFirebase() async {
 
 /// Gets the latest data snapshot of the database.
 Future<void> getData() async {
-  dynamic db = (await dbRef.get()).value;
+  dynamic db;
+  try {
+    db = (await dbRef.get()).value;
+  } on Exception {
+    print('The database of the current district is empty.');
+    await finish();
+  }
   if (db == null || db[district] == null) {
     print('The database of the current district is empty.');
     await finish();
@@ -130,7 +134,7 @@ Future<void> getTeamInfo(final teamNumber) async {
             (teamEntry['avgBarClimbed'] ?? 0.0).toStringAsPrecision(3),
           ],
           [
-            ' Average Score Total',
+            'Average Score Total',
             (teamEntry['avgScoreTotal'] ?? 0.0).toStringAsPrecision(3),
           ],
         ],
@@ -258,52 +262,59 @@ void runCommand(final String? command,
   if (command == null || command.isEmpty) return;
 
   var input = command.split(' ');
-  switch (input.first) {
+  switch (input.first.toLowerCase()) {
     case 'h':
     case 'help':
-      text();
       if (checkNumberOfArgs(input.length - 1, expected: 0)) {
         print(helpMessage);
       }
+      textAlignLeft = true;
+      text();
       break;
     case 'i':
     case 'info':
-      text();
       if (checkNumberOfArgs(input.length - 1, expected: 1)) {
         await getTeamInfo(input[1]);
       }
+      textAlignLeft = false;
+      text();
       break;
     case 'n':
     case 'notes':
-      text();
       if (checkNumberOfArgs(input.length - 1, expected: 1)) {
         await getTeamNotes(input[1]);
       }
+      textAlignLeft = true;
+      text();
       break;
 
     case 'p':
     case 'placements':
-      text();
       if (checkNumberOfArgs(input.length - 1, expected: 0)) {
         await getTeamsPlacements();
       }
+      textAlignLeft = false;
+      text();
       break;
     case 'faggot':
+      textAlignLeft = false;
       ilay();
       break;
     case 'q':
     case 'exit':
     case 'quit':
     case 'stop':
-      text();
       if (checkNumberOfArgs(input.length - 1, expected: 0)) {
         print('Bye bye!');
         await finish();
       }
+      textAlignLeft = false;
+      text();
       break;
     default:
-      text();
       print('Unknown command. Enter \'help\' to see the list of commands.');
+      textAlignLeft = false;
+      text();
   }
 }
 
@@ -315,6 +326,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'Database CLI',
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   String _currentText = helpMessage;
   bool _dcmp = district == 'dcmp';
   final _theme = ThemeData(
@@ -324,6 +352,7 @@ class _MyAppState extends State<MyApp> {
   late FocusNode _focusNode;
   final TextEditingController _controller = TextEditingController();
   bool _ilay = false;
+  double screenWidth = 0;
 
   @override
   void initState() {
@@ -334,134 +363,145 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Database CLI',
-      home: Scaffold(
-        backgroundColor: _theme.backgroundColor,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                          padding: const EdgeInsets.only(left: 50, right: 300),
-                          child: Row(
-                            children: [
-                              Text('District Four',
-                                  style: TextStyle(color: _theme.primaryColor)),
-                              Switch(
-                                trackColor: MaterialStateProperty.all(
-                                  _theme.shadowColor,
-                                ),
-                                thumbColor: MaterialStateProperty.all(
-                                  _theme.primaryColor,
-                                ),
-                                value: _dcmp,
-                                onChanged: (val) => setState(
-                                  () {
-                                    _dcmp = val;
-                                    if (_dcmp) {
-                                      district = 'dcmp';
-                                    } else {
-                                      district = 'district-four';
-                                    }
-                                  },
-                                ),
+    screenWidth = MediaQuery.of(context).size.width;
+    return Scaffold(
+      backgroundColor: _theme.backgroundColor,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(
+                            left: screenWidth / 30, right: screenWidth / 5),
+                        child: Row(
+                          children: [
+                            Text(
+                              'District Four',
+                              style: TextStyle(
+                                color: _theme.primaryColor,
+                                fontSize: screenWidth / 120 + 8,
                               ),
-                              Text('DCMP',
-                                  style: TextStyle(color: _theme.primaryColor)),
-                            ],
-                          )),
-                      SizedBox(
-                        width: 500,
-                        child: TextField(
-                          focusNode: _focusNode,
-                          onSubmitted: (value) {
-                            setState(() {
-                              runCommand(
-                                value,
-                                ilay: () {
-                                  if (!_ilay) setState(() => _ilay = true);
+                            ),
+                            Switch(
+                              trackColor: MaterialStateProperty.all(
+                                _theme.shadowColor,
+                              ),
+                              thumbColor: MaterialStateProperty.all(
+                                _theme.primaryColor,
+                              ),
+                              value: _dcmp,
+                              onChanged: (val) => setState(
+                                () {
+                                  _dcmp = val;
+                                  if (_dcmp) {
+                                    district = 'dcmp';
+                                  } else {
+                                    district = 'district-four';
+                                  }
                                 },
-                                text: () {
-                                  if (_ilay) setState(() => _ilay = false);
-                                },
-                              );
-                              _controller.clear();
-                              _focusNode.unfocus();
-                            });
-                          },
-                          controller: _controller,
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
-                          autofocus: true,
-                          cursorColor: _theme.primaryColor,
-                          maxLength: 15,
-                          style: TextStyle(
-                              fontSize: 25, color: _theme.primaryColor),
-                          decoration: InputDecoration(
-                            hintText: 'Enter a command...',
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 1,
-                                color: _theme.primaryColor,
                               ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 1,
+                            Text(
+                              'DCMP',
+                              style: TextStyle(
                                 color: _theme.primaryColor,
+                                fontSize: screenWidth / 120 + 8,
                               ),
                             ),
-                            disabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 1,
-                                color: _theme.primaryColor,
-                              ),
+                          ],
+                        )),
+                    SizedBox(
+                      width: screenWidth / 3,
+                      child: TextField(
+                        focusNode: _focusNode,
+                        onSubmitted: (value) {
+                          setState(() {
+                            runCommand(
+                              value,
+                              ilay: () {
+                                if (!_ilay) setState(() => _ilay = true);
+                              },
+                              text: () {
+                                if (_ilay) setState(() => _ilay = false);
+                              },
+                            );
+                            _controller.clear();
+                            _focusNode.unfocus();
+                          });
+                        },
+                        controller: _controller,
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        autofocus: true,
+                        cursorColor: _theme.primaryColor,
+                        maxLength: 15,
+                        style:
+                            TextStyle(fontSize: 25, color: _theme.primaryColor),
+                        decoration: InputDecoration(
+                          hintText: 'Enter a command...',
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: _theme.primaryColor,
                             ),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 1,
-                                color: _theme.primaryColor,
-                              ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: _theme.primaryColor,
+                            ),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: _theme.primaryColor,
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: _theme.primaryColor,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              Expanded(
-                flex: 6,
-                child: _ilay
-                    ? Image.asset('assets/images/ilay.jpeg')
-                    : Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: SizedBox(
-                            width: 800,
-                            child: Text(
-                              _currentText,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: _theme.primaryColor,
-                              ),
+            ),
+            Expanded(
+              flex: 6,
+              child: _ilay
+                  ? Image.asset('assets/images/ilay.jpeg')
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: SizedBox(
+                          width: screenWidth / 2,
+                          child: Text(
+                            _currentText,
+                            textAlign: textAlignLeft
+                                ? TextAlign.start
+                                : TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: _theme.primaryColor,
                             ),
                           ),
                         ),
                       ),
-              ),
-            ],
-          ),
+                    ),
+            ),
+          ],
         ),
       ),
     );
