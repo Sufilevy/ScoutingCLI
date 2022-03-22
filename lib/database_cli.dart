@@ -7,11 +7,18 @@ import 'package:firebase_database/firebase_database.dart';
 const helpMessage = '''\t
   Commands:
 =============
-~ help / h - Show this help message.
-~ info / i <team_number> - Print general info about the team.
-~ notes / n <team_number> - Print all of the notes written on the team.
-~ placements / p - Show a table with the placements of all of the teams.
-~ exit / quit / stop / q - Quit the program.
+
+h
+> Show this help message.
+
+i <team_number>
+> Print general info about the team.
+
+n <team_number>
+> Print all of the notes written on the team.
+
+p
+> Show a table with the placements of all of the teams.
 ''';
 
 // ignore: prefer_function_declarations_over_variables
@@ -264,7 +271,6 @@ void runCommand(final String? command,
   var input = command.split(' ');
   switch (input.first.toLowerCase()) {
     case 'h':
-    case 'help':
       if (checkNumberOfArgs(input.length - 1, expected: 0)) {
         print(helpMessage);
       }
@@ -272,7 +278,6 @@ void runCommand(final String? command,
       text();
       break;
     case 'i':
-    case 'info':
       if (checkNumberOfArgs(input.length - 1, expected: 1)) {
         await getTeamInfo(input[1]);
       }
@@ -280,7 +285,6 @@ void runCommand(final String? command,
       text();
       break;
     case 'n':
-    case 'notes':
       if (checkNumberOfArgs(input.length - 1, expected: 1)) {
         await getTeamNotes(input[1]);
       }
@@ -289,7 +293,6 @@ void runCommand(final String? command,
       break;
 
     case 'p':
-    case 'placements':
       if (checkNumberOfArgs(input.length - 1, expected: 0)) {
         await getTeamsPlacements();
       }
@@ -300,20 +303,9 @@ void runCommand(final String? command,
       textAlignLeft = false;
       ilay();
       break;
-    case 'q':
-    case 'exit':
-    case 'quit':
-    case 'stop':
-      if (checkNumberOfArgs(input.length - 1, expected: 0)) {
-        print('Bye bye!');
-        await finish();
-      }
-      textAlignLeft = false;
-      text();
-      break;
     default:
-      print('Unknown command. Enter \'help\' to see the list of commands.');
-      textAlignLeft = false;
+      print('Unknown command.\n\n$helpMessage');
+      textAlignLeft = true;
       text();
   }
 }
@@ -379,7 +371,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Padding(
                         padding: EdgeInsets.only(
-                            left: screenWidth / 30, right: screenWidth / 5),
+                            left: screenWidth / 30, right: screenWidth / 7.5),
                         child: Row(
                           children: [
                             Text(
@@ -418,7 +410,7 @@ class _HomePageState extends State<HomePage> {
                           ],
                         )),
                     SizedBox(
-                      width: screenWidth / 3,
+                      width: screenWidth / 2.5,
                       child: TextField(
                         focusNode: _focusNode,
                         onSubmitted: (value) {
@@ -486,14 +478,14 @@ class _HomePageState extends State<HomePage> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: SizedBox(
-                          width: screenWidth / 2,
+                          width: screenWidth / 1.5,
                           child: Text(
                             _currentText,
                             textAlign: textAlignLeft
                                 ? TextAlign.start
                                 : TextAlign.center,
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: screenWidth / 300 + 15,
                               color: _theme.primaryColor,
                             ),
                           ),
