@@ -315,7 +315,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _currentText = "";
+  String _currentText = helpMessage;
   bool _dcmp = district == 'dcmp';
   final _theme = ThemeData(
       backgroundColor: Colors.black,
