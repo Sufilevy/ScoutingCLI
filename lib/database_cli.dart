@@ -158,12 +158,13 @@ Future<void> getTeamInfo(final teamNumber) async {
           barsString.add('  ');
         }
       }
-      print(table +
-          '\n\n Robot\'s main focus (1 = Scoring, 5 = Defending): ' +
+      print('Team Number: $teamNumber\n\n' +
+          table +
+          '\n\n Robot\'s main focus (Scoring 1 <-> 5 Defending): ' +
           teamEntry['avgRobotFocus'].toString() +
           '\n' +
           '\n Bars that the robot can climb:\n' +
-          '1    2    3    4\n[${barsString[0]}]  [${barsString[1]}]  [${barsString[2]}]  [${barsString[3]}]');
+          ' 1    2    3    4\n[${barsString[0]}]  [${barsString[1]}]  [${barsString[2]}]  [${barsString[3]}]');
     }
   }
 }
@@ -234,7 +235,7 @@ Future<void> getTeamsPlacements() async {
 
   List<List<String>> placements = [];
   for (var i = 0; i < teams.length; i++) {
-    placements.add([(i + 1).toString(), teams[i].first]);
+    placements.add([(i + 1).toString().padRight(2, ' '), teams[i].first]);
   }
   final table = dolumnify(
     [
@@ -363,9 +364,9 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              flex: 1,
+              flex: 2,
               child: Padding(
-                padding: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.only(top: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -470,20 +471,20 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Expanded(
-              flex: 6,
+              flex: 11,
               child: _ilay
                   ? Image.asset('assets/images/ilay.jpeg')
                   : Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.only(bottom: 12),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: SizedBox(
-                          width: screenWidth / 1.5,
+                          width: screenWidth / 1.25,
                           child: Text(
                             _currentText,
                             textAlign: textAlignLeft
                                 ? TextAlign.start
-                                : TextAlign.center,
+                                : TextAlign.start,
                             style: TextStyle(
                               fontSize: screenWidth / 300 + 15,
                               color: _theme.primaryColor,
