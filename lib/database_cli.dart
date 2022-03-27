@@ -26,17 +26,19 @@ dcmp
 Available districts: $districts
 ''';
 
-// ignore: prefer_function_declarations_over_variables
+// ignore_for_file: prefer_function_declarations_over_variables
 void Function(Object) print = (object) {};
+void Function() finishedLoading = () {};
 bool textAlignLeft = true;
 late final DatabaseReference dbRef;
 late final FirebaseApp app;
 Map<dynamic, dynamic> dbNotes = {}, dbAverages = {};
 String district = "";
+bool firebaseReady = false;
 
 void main() async {
-  await setupFirebase();
   runApp(const MyApp());
+  await setupFirebase();
 }
 
 Future<void> finish() async {
@@ -68,6 +70,7 @@ Future<void> setupFirebase() async {
   if (db != null) {
     district = db['district'];
   }
+  finishedLoading();
 }
 
 /// Gets the latest data snapshot of the database.
@@ -352,9 +355,7 @@ class _HomePageState extends State<HomePage> {
       primaryColor: Colors.white,
       shadowColor: Colors.grey);
   late FocusNode _focusNode;
-  late FocusNode _districtFocusNode;
   final TextEditingController _controller = TextEditingController();
-  final TextEditingController _districtController = TextEditingController();
   bool _ilay = false;
   double screenWidth = 0;
 
@@ -362,108 +363,122 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _focusNode = FocusNode();
-    _districtFocusNode = FocusNode();
-    _districtFocusNode.unfocus();
+    finishedLoading = () => setState(() => firebaseReady = true);
     print = (object) => setState(() => _currentText = object.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      backgroundColor: _theme.backgroundColor,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: SizedBox(
-                  width: screenWidth / 2,
-                  child: TextField(
-                    focusNode: _focusNode,
-                    onSubmitted: (value) {
-                      setState(() {
-                        runCommand(
-                          value,
-                          ilay: () {
-                            if (!_ilay) setState(() => _ilay = true);
-                          },
-                          text: () {
-                            if (_ilay) setState(() => _ilay = false);
-                          },
-                        );
-                        _controller.clear();
-                        _focusNode.unfocus();
-                      });
-                    },
-                    controller: _controller,
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                    cursorColor: _theme.primaryColor,
-                    maxLength: 15,
-                    style: TextStyle(fontSize: 20, color: _theme.primaryColor),
-                    decoration: InputDecoration(
-                      hintText: 'Enter a command...',
-                      hintStyle:
-                          TextStyle(fontSize: 20, color: _theme.primaryColor),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: _theme.primaryColor,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: _theme.primaryColor,
-                        ),
-                      ),
-                      disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: _theme.primaryColor,
-                        ),
-                      ),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          width: 1,
-                          color: _theme.primaryColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 11,
-              child: _ilay
-                  ? Image.asset('assets/images/ilay.jpeg')
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(child: child, opacity: animation);
+      },
+      child: Scaffold(
+        key: ValueKey<bool>(firebaseReady),
+        backgroundColor: _theme.backgroundColor,
+        body: firebaseReady
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 12),
                         child: SizedBox(
-                          width: screenWidth / 1.25,
-                          child: Text(
-                            _currentText,
-                            textAlign: textAlignLeft
-                                ? TextAlign.start
-                                : TextAlign.start,
+                          width: screenWidth / 2,
+                          child: TextField(
+                            focusNode: _focusNode,
+                            onSubmitted: (value) {
+                              setState(() {
+                                runCommand(
+                                  value,
+                                  ilay: () {
+                                    if (!_ilay) setState(() => _ilay = true);
+                                  },
+                                  text: () {
+                                    if (_ilay) setState(() => _ilay = false);
+                                  },
+                                );
+                                _controller.clear();
+                                _focusNode.unfocus();
+                              });
+                            },
+                            controller: _controller,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            cursorColor: _theme.primaryColor,
+                            maxLength: 15,
                             style: TextStyle(
-                              fontSize: screenWidth / 300 + 15,
-                              color: _theme.primaryColor,
+                                fontSize: 20, color: _theme.primaryColor),
+                            decoration: InputDecoration(
+                              hintText: 'Enter a command...',
+                              hintStyle: TextStyle(
+                                  fontSize: 20, color: _theme.primaryColor),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: _theme.primaryColor,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: _theme.primaryColor,
+                                ),
+                              ),
+                              disabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: _theme.primaryColor,
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: _theme.primaryColor,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-            ),
-          ],
-        ),
+                    Expanded(
+                      flex: 11,
+                      child: _ilay
+                          ? Image.asset('assets/images/ilay.jpeg')
+                          : Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: SizedBox(
+                                  width: screenWidth / 1.25,
+                                  child: Text(
+                                    _currentText,
+                                    textAlign: textAlignLeft
+                                        ? TextAlign.start
+                                        : TextAlign.start,
+                                    style: TextStyle(
+                                      fontSize: screenWidth / 300 + 15,
+                                      color: _theme.primaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
+              )
+            : Center(
+                child: Text(
+                  'Loading...',
+                  style: TextStyle(color: _theme.primaryColor, fontSize: 30),
+                ),
+              ),
       ),
     );
   }
