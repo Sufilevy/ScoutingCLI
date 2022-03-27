@@ -149,6 +149,10 @@ Future<void> getTeamInfo(final teamNumber) async {
             (teamEntry['avgBarClimbed'] ?? 0.0).toStringAsPrecision(3),
           ],
           [
+            'Average Sconds Climbed',
+            (teamEntry['avgTimeClimbed'] ?? 0.0).toStringAsPrecision(3),
+          ],
+          [
             'Average Score Total',
             (teamEntry['avgScoreTotal'] ?? 0.0).toStringAsPrecision(3),
           ],
