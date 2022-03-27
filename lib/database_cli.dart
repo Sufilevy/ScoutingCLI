@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:dolumns/dolumns.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-const helpMessage = '''\t
+const districts = ['district-four', 'dcmp-practice', 'dcmp'];
+final helpMessage = '''\t
   Commands:
 =============
 
@@ -19,6 +20,10 @@ n <team_number>
 
 p
 > Show a table with the placements of all of the teams.
+
+dcmp
+> Enter one of the names of the districts to switch to that district.
+Available districts: $districts
 ''';
 
 // ignore: prefer_function_declarations_over_variables
@@ -30,8 +35,8 @@ Map<dynamic, dynamic> dbNotes = {}, dbAverages = {};
 String district = "";
 
 void main() async {
-  runApp(const MyApp());
   await setupFirebase();
+  runApp(const MyApp());
 }
 
 Future<void> finish() async {
@@ -305,7 +310,12 @@ void runCommand(final String? command,
       ilay();
       break;
     default:
-      print('Unknown command.\n\n$helpMessage');
+      if (districts.contains(command)) {
+        district = command;
+        print('District set to: $district');
+      } else {
+        print('Unknown command.\n\n$helpMessage');
+      }
       textAlignLeft = true;
       text();
   }
@@ -337,13 +347,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _currentText = helpMessage;
-  bool _dcmp = district == 'dcmp';
   final _theme = ThemeData(
       backgroundColor: Colors.black,
       primaryColor: Colors.white,
       shadowColor: Colors.grey);
   late FocusNode _focusNode;
+  late FocusNode _districtFocusNode;
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _districtController = TextEditingController();
   bool _ilay = false;
   double screenWidth = 0;
 
@@ -351,6 +362,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _focusNode = FocusNode();
+    _districtFocusNode = FocusNode();
+    _districtFocusNode.unfocus();
     print = (object) => setState(() => _currentText = object.toString());
   }
 
@@ -367,106 +380,61 @@ class _HomePageState extends State<HomePage> {
               flex: 2,
               child: Padding(
                 padding: const EdgeInsets.only(top: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(
-                            left: screenWidth / 30, right: screenWidth / 7.5),
-                        child: Row(
-                          children: [
-                            Text(
-                              'District Four',
-                              style: TextStyle(
-                                color: _theme.primaryColor,
-                                fontSize: screenWidth / 120 + 8,
-                              ),
-                            ),
-                            Switch(
-                              trackColor: MaterialStateProperty.all(
-                                _theme.shadowColor,
-                              ),
-                              thumbColor: MaterialStateProperty.all(
-                                _theme.primaryColor,
-                              ),
-                              value: _dcmp,
-                              onChanged: (val) => setState(
-                                () {
-                                  _dcmp = val;
-                                  if (_dcmp) {
-                                    district = 'dcmp';
-                                  } else {
-                                    district = 'district-four';
-                                  }
-                                },
-                              ),
-                            ),
-                            Text(
-                              'DCMP',
-                              style: TextStyle(
-                                color: _theme.primaryColor,
-                                fontSize: screenWidth / 120 + 8,
-                              ),
-                            ),
-                          ],
-                        )),
-                    SizedBox(
-                      width: screenWidth / 2.5,
-                      child: TextField(
-                        focusNode: _focusNode,
-                        onSubmitted: (value) {
-                          setState(() {
-                            runCommand(
-                              value,
-                              ilay: () {
-                                if (!_ilay) setState(() => _ilay = true);
-                              },
-                              text: () {
-                                if (_ilay) setState(() => _ilay = false);
-                              },
-                            );
-                            _controller.clear();
-                            _focusNode.unfocus();
-                          });
-                        },
-                        controller: _controller,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        autofocus: true,
-                        cursorColor: _theme.primaryColor,
-                        maxLength: 15,
-                        style:
-                            TextStyle(fontSize: 25, color: _theme.primaryColor),
-                        decoration: InputDecoration(
-                          hintText: 'Enter a command...',
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 1,
-                              color: _theme.primaryColor,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 1,
-                              color: _theme.primaryColor,
-                            ),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 1,
-                              color: _theme.primaryColor,
-                            ),
-                          ),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 1,
-                              color: _theme.primaryColor,
-                            ),
-                          ),
+                child: SizedBox(
+                  width: screenWidth / 2,
+                  child: TextField(
+                    focusNode: _focusNode,
+                    onSubmitted: (value) {
+                      setState(() {
+                        runCommand(
+                          value,
+                          ilay: () {
+                            if (!_ilay) setState(() => _ilay = true);
+                          },
+                          text: () {
+                            if (_ilay) setState(() => _ilay = false);
+                          },
+                        );
+                        _controller.clear();
+                        _focusNode.unfocus();
+                      });
+                    },
+                    controller: _controller,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    cursorColor: _theme.primaryColor,
+                    maxLength: 15,
+                    style: TextStyle(fontSize: 20, color: _theme.primaryColor),
+                    decoration: InputDecoration(
+                      hintText: 'Enter a command...',
+                      hintStyle:
+                          TextStyle(fontSize: 20, color: _theme.primaryColor),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: _theme.primaryColor,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: _theme.primaryColor,
+                        ),
+                      ),
+                      disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: _theme.primaryColor,
+                        ),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: _theme.primaryColor,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
