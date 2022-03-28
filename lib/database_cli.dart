@@ -156,6 +156,10 @@ Future<void> getTeamInfo(final teamNumber) async {
             'Average Score Total',
             (teamEntry['avgScoreTotal'] ?? 0.0).toStringAsPrecision(3),
           ],
+          [
+            'Number of Reports',
+            (teamEntry['numberOfReports'] ?? 0),
+          ]
         ],
         columnSplitter: ' | ',
         headerSeparator: '=',
