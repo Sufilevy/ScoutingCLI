@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dolumns/dolumns.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-const districts = ['district-four', 'dcmp-practice', 'dcmp'];
+const districts = ['district-four', 'dcmp-practice', 'dcmp', 'dcmp-new'];
 final helpMessage = '''\t
   Commands:
 =============
