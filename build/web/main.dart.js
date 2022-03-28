@@ -7929,7 +7929,7 @@ case 9:$.zg=!1
 b.$0()
 s=4
 break
-case 10:if(B.b.w(B.lJ,B.b.gD(o))){p=B.b.gD(o)
+case 10:if(B.b.w(B.lJ,B.b.gD(o))||J.e(B.b.gD(o),"dcmp-1657")){p=B.b.gD(o)
 $.MJ=p
 $.dx().$1("District set to: "+p)}else $.dx().$1("Unknown command.\n\n"+$.a7f())
 $.zg=!0
