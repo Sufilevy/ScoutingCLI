@@ -285,8 +285,9 @@ void runCommand(final String? command,
     {required final Function ilay, required final Function text}) async {
   if (command == null || command.isEmpty) return;
 
-  var input = command.split(' ');
-  switch (input.first.toLowerCase()) {
+  var input =
+      command.split(' ').map((element) => element.toLowerCase()).toList();
+  switch (input.first) {
     case 'h':
       if (checkNumberOfArgs(input.length - 1, expected: 0)) {
         print(helpMessage);
@@ -321,8 +322,8 @@ void runCommand(final String? command,
       ilay();
       break;
     default:
-      if (districts.contains(command)) {
-        district = command;
+      if (districts.contains(input.first)) {
+        district = input.first;
         print('District set to: $district');
       } else {
         print('Unknown command.\n\n$helpMessage');
