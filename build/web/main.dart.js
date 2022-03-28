@@ -7786,31 +7786,31 @@ s=1
 break
 case 1:return A.O(q,r)}})
 return A.P($async$a6k,r)},
-MO(a1){var s=0,r=A.Q(t.H),q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0
-var $async$MO=A.R(function(a2,a3){if(a2===1)return A.N(a3,r)
+MO(a2){var s=0,r=A.Q(t.H),q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1
+var $async$MO=A.R(function(a3,a4){if(a3===1)return A.N(a4,r)
 while(true)switch(s){case 0:s=3
 return A.S(A.km(),$async$MO)
-case 3:s=A.W1(a1,null)==null?4:6
+case 3:s=A.W1(a2,null)==null?4:6
 break
 case 4:$.dx().$1("Invalid team number. Only use numbers.")
 s=1
 break
 s=5
 break
-case 6:s=!J.dO($.z8,a1)?7:9
+case 6:s=!J.dO($.z8,a2)?7:9
 break
 case 7:$.dx().$1(u.k)
 s=1
 break
 s=8
 break
-case 9:p=J.a9($.z8,a1)
+case 9:p=J.a9($.z8,a2)
 o=t.G
 n=A.a(["NAME","VALUE"],o)
-a0=A
+a1=A
 s=10
-return A.S(A.a6k(a1),$async$MO)
-case 10:m=a0.a(["Placement",a3],o)
+return A.S(A.a6k(a2),$async$MO)
+case 10:m=a1.a(["Placement",a4],o)
 l=J.an(p)
 k=l.h(p,"avgBallsAutonomus")
 k=A.a(["Average Balls Autonomus",J.jg(k==null?0:k,3)],o)
@@ -7829,11 +7829,13 @@ e=A.a(["Average Bar Climbed",J.jg(e==null?0:e,3)],o)
 d=l.h(p,"avgTimeClimbed")
 d=A.a(["Average Sconds Climbed",J.jg(d==null?0:d,3)],o)
 c=l.h(p,"avgScoreTotal")
-b=A.a9E(A.a([n,m,k,j,i,h,g,f,e,d,A.a(["Average Score Total",J.jg(c==null?0:c,3)],o)],t.EY)," | ",!0,"=")
-a=[]
-for(o=J.at(J.a9(J.a9($.z8,a1),"barsCanClimb"));o.t();)if(J.e(o.gB(o),!0))a.push("X")
-else a.push("  ")
-$.dx().$1(B.c.O("Team Number: "+a1+"\n\n"+b+"\n\n Robot's main focus (Scoring 1 <-> 5 Defending): ",J.bN(l.h(p,"avgRobotFocus")))+"\n\n Bars that the robot can climb:\n"+(" 1    2    3    4\n["+a[0]+"]  ["+a[1]+"]  ["+a[2]+"]  ["+a[3]+"]"))
+c=A.a(["Average Score Total",J.jg(c==null?0:c,3)],o)
+b=l.h(p,"numberOfReports")
+a=A.a9E(A.a([n,m,k,j,i,h,g,f,e,d,c,A.a(["Number of Reports",b==null?0:b],o)],t.EY)," | ",!0,"=")
+a0=[]
+for(o=J.at(J.a9(J.a9($.z8,a2),"barsCanClimb"));o.t();)if(J.e(o.gB(o),!0))a0.push("X")
+else a0.push("  ")
+$.dx().$1(B.c.O("Team Number: "+a2+"\n\n"+a+"\n\n Robot's main focus (Scoring 1 <-> 5 Defending): ",J.bN(l.h(p,"avgRobotFocus")))+"\n\n Bars that the robot can climb:\n"+(" 1    2    3    4\n["+a0[0]+"]  ["+a0[1]+"]  ["+a0[2]+"]  ["+a0[3]+"]"))
 case 8:case 5:case 1:return A.O(q,r)}})
 return A.P($async$MO,r)},
 a6i(a){var s=0,r=A.Q(t.H),q,p,o,n,m,l,k,j,i,h,g,f
