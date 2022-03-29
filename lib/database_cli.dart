@@ -322,8 +322,11 @@ void runCommand(final String? command,
       ilay();
       break;
     default:
-      if (districts.contains(input.first) || input.first == 'dcmp-1657') {
+      if (districts.contains(input.first)) {
         district = input.first;
+        print('District set to: $district');
+      } else if (input.first == '1657') {
+        district = 'dcmp-new-1657';
         print('District set to: $district');
       } else {
         print('Unknown command.\n\n$helpMessage');
