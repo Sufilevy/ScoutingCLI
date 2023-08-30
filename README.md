@@ -1,3 +1,1 @@
-A database CLI for Hamosad 1657 scouting app.
-
-[Open the website](https://database.hamosad1657.com)
+An Online Command-Line-Interface for the Scouting Application of the FRC team Hamosad 1657.
